@@ -1,8 +1,5 @@
 const FACE_MATCH_THRESHOLD = 0.5;
 
-/**
- * Calculate Euclidean distance between two vectors
- */
 function euclideanDistance(d1, d2) {
   let sum = 0;
   for (let i = 0; i < d1.length; i++) {

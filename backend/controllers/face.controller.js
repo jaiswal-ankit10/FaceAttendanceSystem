@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import matchFace from "../services/faceMatcher.js";
 
 export const registerFace = async (req, res) => {
   try {
@@ -8,20 +9,28 @@ export const registerFace = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    let user = await User.findOne({ empId });
-
-    if (!user) {
-      user = new User({
-        name,
-        empId,
-        faceDescriptors: [],
-      });
+    const empExists = await User.findOne({ empId });
+    if (empExists) {
+      return res
+        .status(409)
+        .json({ message: "Employee ID already registered" });
     }
 
-    descriptors.forEach((d) => {
-      if (user.faceDescriptors.length < 5) {
-        user.faceDescriptors.push({ descriptor: d });
+    const users = await User.find({});
+
+    for (const descriptor of descriptors) {
+      const match = matchFace(descriptor, users);
+      if (match) {
+        return res.status(409).json({
+          message: "This face is already registered",
+        });
       }
+    }
+
+    const user = new User({
+      name,
+      empId,
+      faceDescriptors: descriptors.map((d) => ({ descriptor: d })),
     });
 
     await user.save();

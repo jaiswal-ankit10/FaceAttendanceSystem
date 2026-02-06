@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 import WebCamCapture from "../components/WebCamCapture";
 import { Link } from "react-router-dom";
@@ -6,39 +6,67 @@ import { Link } from "react-router-dom";
 const API = `${import.meta.env.VITE_API_INSTANCE}/face/register`;
 
 export default function FaceRegister() {
+  const poseLock = useRef();
+
   const POSES = ["FRONT", "LEFT", "RIGHT"];
 
   const [name, setName] = useState("");
   const [empId, setEmpId] = useState("");
-  const [descriptors, setDescriptors] = useState([]);
+  // const [descriptors, setDescriptors] = useState([]);
+  const [captures, setCaptures] = useState([]);
   const [capturedPoses, setCapturedPoses] = useState([]);
   const [currentPoseIndex, setCurrentPoseIndex] = useState(0);
   const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleCapture = (descriptor, pose) => {
+  const handleCapture = (descriptor, pose, preview) => {
+    if (capturedPoses.length >= POSES.length) return;
+
+    if (!pose) return;
+    if (poseLock.current) return;
+    if (captures.some((c) => c.pose === pose)) return;
     if (capturedPoses.includes(pose)) return;
+    poseLock.current = true;
 
-    setDescriptors((prev) => [...prev, descriptor]);
+    setCaptures((prev) => [...prev, { pose, descriptor, preview }]);
     setCapturedPoses((prev) => [...prev, pose]);
-    setCurrentPoseIndex((prev) => prev + 1);
+
+    setCurrentPoseIndex((prev) => {
+      const next = prev + 1;
+      return next < POSES.length ? next : prev;
+    });
+
+    setTimeout(() => {
+      poseLock.current = false;
+    }, 1200);
   };
 
   const submit = async () => {
-    if (descriptors.length < 3) {
-      alert("Capture all face directions");
+    if (captures.length < POSES.length) {
+      setError("Capture all face directions (FRONT, LEFT, RIGHT)");
       return;
     }
 
-    await axios.post(API, {
-      name,
-      empId,
-      descriptors,
-    });
+    try {
+      setError("");
+      setSuccess("");
 
-    alert("Face registered successfully!");
-    setDescriptors([]);
-    setCapturedPoses([]);
-    setCurrentPoseIndex(0);
+      await axios.post(API, {
+        name,
+        empId,
+        descriptors: captures.map((c) => c.descriptor),
+      });
+
+      setSuccess("Face registered successfully");
+      setCaptures([]);
+      setCapturedPoses([]);
+      setCurrentPoseIndex(0);
+      setCameraEnabled(false);
+    } catch (err) {
+      setSuccess("");
+      setError(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
@@ -48,7 +76,6 @@ export default function FaceRegister() {
           Face Registration
         </h2>
 
-        {/* Instructions */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mb-4 text-center">
           <p className="font-medium">Capture Instruction</p>
           <p>
@@ -73,6 +100,18 @@ export default function FaceRegister() {
           />
         </div>
 
+        {error && (
+          <div className="my-3 bg-red-100 text-red-700 border border-red-300 rounded-lg p-2 text-sm text-center">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="my-3 bg-green-100 text-green-700 border border-green-300 rounded-lg p-2 text-sm text-center">
+            {success}
+          </div>
+        )}
+
         <div className="mt-5 flex justify-center">
           {currentPoseIndex < POSES.length && (
             <WebCamCapture
@@ -85,12 +124,20 @@ export default function FaceRegister() {
           )}
         </div>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          Captured:{" "}
-          <span className="font-medium">
-            {capturedPoses.join(", ") || "None"}
-          </span>
-        </p>
+        {captures.length > 0 && (
+          <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+            {captures.map((c) => (
+              <div key={c.pose}>
+                <img
+                  src={c.preview}
+                  alt={c.pose}
+                  className="w-20 h-20 object-cover rounded "
+                />
+                <p className="text-xs mt-1 font-medium">{c.pose}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         <button
           onClick={submit}
