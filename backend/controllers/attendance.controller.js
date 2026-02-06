@@ -50,3 +50,23 @@ export const markAttendance = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getAttendanceList = async (req, res) => {
+  try {
+    const records = await Attendance.find()
+      .populate("user", "name empId")
+      .sort({ createdAt: -1 });
+
+    const response = records.map((item) => ({
+      name: item.user?.name,
+      employeeId: item.user?.empId,
+      date: formatDate(item.date),
+      checkInTime: formatTime(item.checkInTime),
+    }));
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch attendance list" });
+  }
+};

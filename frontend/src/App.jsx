@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { loadFaceModels } from "./services/loadModels";
 import FaceRegister from "./pages/FaceRegister";
 import FaceAttendance from "./pages/FaceAttendance";
+import AttendanceList from "./pages/AttendanceList";
 
 const App = () => {
   const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -23,6 +24,8 @@ const App = () => {
 
         <Route path="/register" element={<FaceRegister />} />
         <Route path="/attendance" element={<FaceAttendance />} />
+
+        <Route path="/attendance-list" element={<AttendanceList />} />
 
         <Route path="*" element={<h2>Page Not Found</h2>} />
       </Routes>
