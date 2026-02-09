@@ -1,46 +1,45 @@
-import { User } from "../models/user.model.js";
+import { prisma } from "../config/prisma.js";
 import matchFace from "../services/faceMatcher.js";
 
 export const registerFace = async (req, res) => {
-  try {
-    const { name, empId, descriptors } = req.body;
+  const { name, empId, descriptors } = req.body;
 
-    if (!name || !empId || !descriptors?.length) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+  if (!name || !empId || !descriptors?.length) {
+    return res.status(400).json({ message: "Missing fields" });
+  }
 
-    const empExists = await User.findOne({ empId });
-    if (empExists) {
+  const empExists = await prisma.user.findUnique({
+    where: { empId },
+  });
+
+  if (empExists) {
+    return res.status(409).json({ message: "Employee ID already exists" });
+  }
+
+  const users = await prisma.user.findMany({
+    include: { faceDescriptors: true },
+  });
+
+  for (const d of descriptors) {
+    const match = matchFace(d, users);
+    if (match) {
       return res
         .status(409)
-        .json({ message: "Employee ID already registered" });
+        .json({ message: "This face is already registered" });
     }
+  }
 
-    const users = await User.find({});
-
-    for (const descriptor of descriptors) {
-      const match = matchFace(descriptor, users);
-      if (match) {
-        return res.status(409).json({
-          message: "This face is already registered",
-        });
-      }
-    }
-
-    const user = new User({
+  const user = await prisma.user.create({
+    data: {
       name,
       empId,
-      faceDescriptors: descriptors.map((d) => ({ descriptor: d })),
-    });
+      faceDescriptors: {
+        create: descriptors.map((d) => ({
+          descriptor: d,
+        })),
+      },
+    },
+  });
 
-    await user.save();
-
-    res.status(201).json({
-      message: "Face registered successfully",
-      userId: user._id,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
+  res.json({ message: "Face registered successfully", userId: user.id });
 };

@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
-import connectDB from "./config/db.js";
+// import connectDB from "./config/prisma.js";
 
-await connectDB();
+// await connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
