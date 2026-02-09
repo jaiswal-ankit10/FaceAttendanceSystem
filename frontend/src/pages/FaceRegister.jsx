@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import WebCamCapture from "../components/WebCamCapture";
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ const API = `${import.meta.env.VITE_API_INSTANCE}/face/register`;
 export default function FaceRegister() {
   const poseLock = useRef();
 
-  const POSES = ["FRONT", "LEFT", "RIGHT"];
+  const POSES = ["FRONT", "RIGHT", "LEFT"];
 
   const [name, setName] = useState("");
   const [empId, setEmpId] = useState("");
@@ -20,13 +20,18 @@ export default function FaceRegister() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    if (captures.length === POSES.length) {
+      setCameraEnabled(false);
+    }
+  }, [captures.length]);
   const handleCapture = (descriptor, pose, preview) => {
-    if (capturedPoses.length >= POSES.length) return;
+    if (captures.length >= POSES.length) return;
 
     if (!pose) return;
     if (poseLock.current) return;
     if (captures.some((c) => c.pose === pose)) return;
-    if (capturedPoses.includes(pose)) return;
+    // if (capturedPoses.includes(pose)) return;
     poseLock.current = true;
 
     setCaptures((prev) => [...prev, { pose, descriptor, preview }]);
