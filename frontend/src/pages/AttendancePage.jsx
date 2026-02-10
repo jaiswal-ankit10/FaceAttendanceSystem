@@ -103,7 +103,7 @@ function AttendancePage() {
                   </div>
                   <div>
                     <p className="text-lg font-semibold">Attendance Marked</p>
-                    <p className="text-sm text-green-600">
+                    <p className="text-sm text-gray-600">
                       {result?.checkInTime}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ function AttendancePage() {
               </div>
 
               {/* User Info */}
-              <div className="mt-6 bg-white  rounded-xl p-5 flex items-center gap-4 shadow-sm">
+              <div className="mt-4 bg-white  rounded-xl p-5 flex items-center gap-4 shadow-sm">
                 <img
                   src="/avatar.png"
                   alt="Employee"
@@ -121,11 +121,23 @@ function AttendancePage() {
                 <div>
                   <p className="font-semibold text-gray-800">{result.name}</p>
                   <p className="text-sm text-gray-500">
-                    Employee ID: {result.employeeId}
+                    <span className="text-gray-700">Employee ID:</span>{" "}
+                    {result.employeeId}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Branch: {result?.branch}
+                    <span className="text-gray-700">Branch:</span>{" "}
+                    {result?.branch}
                   </p>
+                  <div className="flex gap-2">
+                    <p className="text-sm text-gray-500">
+                      <span className="text-gray-700">CheckInTime:</span>{" "}
+                      {result?.checkInTime}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="text-gray-700">CheckOutTime:</span>{" "}
+                      {result?.checkOutTime}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -4,6 +4,7 @@ import * as faceapi from "face-api.js";
 import WebCamCapture from "../components/WebCamCapture";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Camera, Check } from "lucide-react";
 
 const API = `${import.meta.env.VITE_API_INSTANCE}/face/register`;
 
@@ -183,7 +184,8 @@ export default function RegisterEmployee() {
               )
             ) : (
               <div className="py-6 flex flex-col items-center">
-                <label className="bg-[#10b981] hover:bg-green-700 text-white px-6 py-3 rounded-lg cursor-pointer transition-colors shadow-sm">
+                <label className="bg-[#10b981] hover:bg-green-700 text-white px-4 py-3 rounded-lg cursor-pointer transition-colors shadow-sm flex justify-center items-center gap-2">
+                  <Camera />
                   Upload Photos
                   <input
                     type="file"
@@ -194,7 +196,7 @@ export default function RegisterEmployee() {
                   />
                 </label>
                 <p className="text-xs text-gray-400 mt-3">
-                  Upload FRONT, RIGHT & LEFT
+                  Upload FRONT, RIGHT & LEFT SIDE
                 </p>
               </div>
             )}
@@ -308,8 +310,9 @@ export default function RegisterEmployee() {
 
             <button
               onClick={submit}
-              className="w-full bg-[#10b981] hover:bg-green-700 text-white font-semibold py-4 rounded-xl mt-6 transition-all shadow-md active:scale-[0.98] cursor-pointer"
+              className="w-full bg-[#10b981] hover:bg-green-700 text-white font-semibold py-4 rounded-xl mt-6 transition-all shadow-md active:scale-[0.98] cursor-pointer flex justify-center items-center gap-2"
             >
+              <Check />
               Register Employee
             </button>
           </div>
