@@ -33,6 +33,7 @@ model Attendance {
   id          Int      @id @default(autoincrement())
   date        DateTime
   checkInTime DateTime
+  checkOutTime DateTime?
   confidence  Float
   userId      Int
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)

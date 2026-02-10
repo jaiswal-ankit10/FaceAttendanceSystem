@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import WebCamCapture from "../components/WebCamCapture";
 import { Link } from "react-router-dom";
+import * as faceapi from "face-api.js";
 
 const API = `${import.meta.env.VITE_API_INSTANCE}/face/register`;
 
@@ -9,6 +10,7 @@ export default function FaceRegister() {
   const poseLock = useRef();
 
   const POSES = ["FRONT", "RIGHT", "LEFT"];
+  const LIVE_POSES = ["FRONT", "RIGHT", "LEFT"];
 
   const [name, setName] = useState("");
   const [empId, setEmpId] = useState("");
@@ -19,6 +21,7 @@ export default function FaceRegister() {
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [uploadPreview, setUploadPreview] = useState(null);
 
   useEffect(() => {
     if (captures.length === POSES.length) {
@@ -47,8 +50,47 @@ export default function FaceRegister() {
     }, 1200);
   };
 
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    for (const file of files) {
+      if (captures.length >= POSES.length) break;
+
+      const nextPose = POSES.find(
+        (pose) => !captures.some((c) => c.pose === pose),
+      );
+
+      if (!nextPose) break;
+
+      const image = await faceapi.bufferToImage(file);
+      const preview = URL.createObjectURL(file);
+
+      const detection = await faceapi
+        .detectAllFaces(image)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (!detection) {
+        setError(`No face detected for ${nextPose} image`);
+        continue;
+      }
+
+      if (detection.length > 1) {
+        setMessage("Multiple faces detected");
+        return;
+      }
+      handleCapture(Array.from(detection.descriptor), nextPose, preview);
+    }
+
+    e.target.value = "";
+  };
+
   const submit = async () => {
-    if (captures.length < POSES.length) {
+    const capturedLivePoses = captures.filter((c) =>
+      LIVE_POSES.includes(c.pose),
+    );
+    if (capturedLivePoses.length < LIVE_POSES.length) {
       setError("Capture all face directions (FRONT, LEFT, RIGHT)");
       return;
     }
@@ -68,6 +110,7 @@ export default function FaceRegister() {
       setCapturedPoses([]);
       setCurrentPoseIndex(0);
       setCameraEnabled(false);
+      setUploadPreview(null);
     } catch (err) {
       setSuccess("");
       setError(err.response?.data?.message || "Registration failed");
@@ -81,13 +124,15 @@ export default function FaceRegister() {
           Face Registration
         </h2>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mb-4 text-center">
-          <p className="font-medium">Capture Instruction</p>
-          <p>
-            Please look <strong>{POSES[currentPoseIndex] ?? "DONE"}</strong> and
-            capture
-          </p>
-        </div>
+        {cameraEnabled && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mb-4 text-center">
+            <p className="font-medium">Capture Instruction</p>
+            <p>
+              Please look <strong>{POSES[currentPoseIndex] ?? "DONE"}</strong>{" "}
+              and capture
+            </p>
+          </div>
+        )}
 
         <div className="space-y-4">
           <input
@@ -116,6 +161,19 @@ export default function FaceRegister() {
             {success}
           </div>
         )}
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-1">
+            Upload Face Photos (Front, Right, Left)
+          </label>
+
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageUpload}
+            className="text-sm border cursor-pointer w-full"
+          />
+        </div>
 
         <div className="mt-5 flex justify-center">
           {currentPoseIndex < POSES.length && (

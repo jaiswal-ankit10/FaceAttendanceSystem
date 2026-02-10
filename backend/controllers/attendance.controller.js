@@ -16,31 +16,54 @@ export const markAttendance = async (req, res) => {
 
   const today = new Date().toISOString().split("T")[0];
 
-  const already = await prisma.attendance.findFirst({
+  const attendance = await prisma.attendance.findFirst({
     where: {
       userId: match.user.id,
       date: new Date(today),
     },
   });
 
-  if (already) {
-    return res.status(409).json({ message: "Attendance already marked" });
+  if (!attendance) {
+    const checkIn = await prisma.attendance.create({
+      data: {
+        userId: match.user.id,
+        date: new Date(today),
+        checkInTime: new Date(),
+        confidence: match.distance,
+      },
+    });
+
+    return res.json({
+      type: "CHECK_IN",
+      message: "Check-in successful",
+      name: match.user.name,
+      employeeId: match.user.empId,
+      date: formatDate(checkIn.date),
+      checkInTime: formatTime(checkIn.checkInTime),
+    });
   }
 
-  const attendance = await prisma.attendance.create({
-    data: {
-      userId: match.user.id,
-      date: new Date(today),
-      checkInTime: new Date(),
-      confidence: match.distance,
-    },
-  });
+  if (!attendance.checkOutTime) {
+    const checkOut = await prisma.attendance.update({
+      where: { id: attendance.id },
+      data: {
+        checkOutTime: new Date(),
+      },
+    });
 
-  res.json({
-    name: match.user.name,
-    employeeId: match.user.empId,
-    date: formatDate(attendance.date),
-    checkInTime: formatTime(attendance.checkInTime),
+    return res.json({
+      type: "CHECK_OUT",
+      message: "Check-out successful",
+      name: match.user.name,
+      employeeId: match.user.empId,
+      date: formatDate(checkOut.date),
+      checkInTime: formatTime(checkOut.checkInTime),
+      checkOutTime: formatTime(checkOut.checkOutTime),
+    });
+  }
+
+  return res.status(409).json({
+    message: "Attendance already completed for today",
   });
 };
 

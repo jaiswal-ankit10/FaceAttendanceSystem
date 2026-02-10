@@ -2,6 +2,7 @@ import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import { useEffect, useRef, useState } from "react";
 import { getFaceDirection } from "../utils/getFaceDirection";
+import { toast } from "react-toastify";
 
 export default function WebCamCapture({
   onCapture,
@@ -63,13 +64,13 @@ export default function WebCamCapture({
 
     if (!detections || detections.length === 0) {
       clearCanvas();
-      setMessage("No face detected");
+      toast.error("No face detected");
       return;
     }
 
     if (detections.length > 1) {
       clearCanvas();
-      setMessage("Multiple faces detected");
+      toast.error("Multiple faces detected");
       return;
     }
 
@@ -96,7 +97,7 @@ export default function WebCamCapture({
     }
 
     captureLock.current = true;
-    setMessage("Face captured");
+    toast.success("Face captured");
 
     onCapture(Array.from(detection.descriptor), direction, preview);
 
@@ -127,12 +128,12 @@ export default function WebCamCapture({
     setProcessing(false);
 
     if (!detections || detections.length === 0) {
-      setMessage("No face detected");
+      toast.error("No face detected");
       return;
     }
 
     if (detections.length > 1) {
-      setMessage("Multiple faces detected");
+      toast.error("Multiple faces detected");
       return;
     }
 
@@ -144,48 +145,48 @@ export default function WebCamCapture({
       return;
     }
 
-    setMessage("Face captured");
+    toast.success("Face captured");
     onCapture(Array.from(detection.descriptor), direction, preview);
   };
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full h-full">
       {!cameraEnabled ? (
         <button
           onClick={() => setCameraEnabled(true)}
-          className="border border-gray-300 rounded px-4 py-2 cursor-pointer"
+          className="w-full sm:w-auto border border-gray-300 rounded-lg px-6 py-2 text-sm font-medium cursor-pointer"
         >
           Enable Camera
         </button>
       ) : (
         <>
-          <div className="relative w-[320px] h-60">
+          <div className="relative w-full h-full min-h-75 bg-black rounded-xl overflow-hidden shadow-inner">
             <Webcam
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               videoConstraints={{ facingMode: "user" }}
-              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              className="absolute inset-0 w-full h-full object-cover rounded-lg"
             />
 
             <canvas
               ref={canvasRef}
               width={320}
               height={240}
-              className="absolute top-0 left-0 z-10 pointer-events-none"
+              className="absolute inset-0 z-10 pointer-events-none"
             />
           </div>
 
-          <div className="mt-3 flex gap-3">
+          <div className="mt-4 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <button
               onClick={captureFace}
               disabled={processing}
-              className="border border-gray-300 rounded px-4 py-2 cursor-pointer"
+              className="w-full sm:w-auto border border-gray-300 rounded-lg px-6 py-2 text-sm font-medium cursor-pointer"
             >
               {processing ? "Processing..." : "Capture Face"}
             </button>
 
             <button
               onClick={() => setCameraEnabled(false)}
-              className="border border-gray-300 rounded px-4 py-2 cursor-pointer"
+              className="w-full sm:w-auto border border-gray-300 rounded-lg px-6 py-2 text-sm font-medium cursor-pointer"
             >
               Disable Camera
             </button>

@@ -26,6 +26,7 @@ export default function FaceAttendance() {
         confidence: res.data.confidence,
         date: res.data.date,
         checkInTime: res.data.checkInTime,
+        checkOutTime: res.data.checkOutTime,
       });
 
       setStatus("Attendance marked successfully");
@@ -85,9 +86,9 @@ export default function FaceAttendance() {
               <p>
                 <strong>Check In Time:</strong> {result.checkInTime}
               </p>
-              {/* <p>
-              <strong>Confidence:</strong> {result.confidence}
-            </p> */}
+              <p>
+                <strong>Check Out Time:</strong> {result.checkOutTime}
+              </p>
             </div>
           )}
 

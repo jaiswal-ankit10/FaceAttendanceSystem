@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { formatDate, formatTime } from "../utils/dateAndTimeFormatter";
 
 const API_URL = `${import.meta.env.VITE_API_INSTANCE}/attendance/list`;
 
@@ -51,6 +52,7 @@ export default function AttendanceList() {
                   <th className="border px-3 py-2">Employee ID</th>
                   <th className="border px-3 py-2">Date</th>
                   <th className="border px-3 py-2">Check-In Time</th>
+                  <th className="border px-3 py-2">Check-Out Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -63,10 +65,17 @@ export default function AttendanceList() {
                 ) : (
                   attendance.map((item, index) => (
                     <tr key={index} className="text-center">
-                      <td className="border px-3 py-2">{item.name}</td>
-                      <td className="border px-3 py-2">{item.employeeId}</td>
-                      <td className="border px-3 py-2">{item.date}</td>
-                      <td className="border px-3 py-2">{item.checkInTime}</td>
+                      <td className="border px-3 py-2">{item.user.name}</td>
+                      <td className="border px-3 py-2">{item.user.empId}</td>
+                      <td className="border px-3 py-2">
+                        {formatDate(item.date)}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {formatTime(item.checkInTime)}
+                      </td>
+                      <td className="border px-3 py-2">
+                        {formatTime(item.checkOutTime)}
+                      </td>
                     </tr>
                   ))
                 )}
