@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { getFaceDirection } from "../utils/getFaceDirection";
 import { toast } from "react-toastify";
 
+const showErrorToastOnce = (message) => {
+  toast.error(message, {
+    toastId: message,
+  });
+};
 export default function WebCamCapture({
   onCapture,
   requiredPose,
@@ -70,7 +75,7 @@ export default function WebCamCapture({
 
     if (detections.length > 1) {
       clearCanvas();
-      toast.error("Multiple faces detected");
+      showErrorToastOnce("Multiple faces detected");
       return;
     }
 
@@ -97,7 +102,7 @@ export default function WebCamCapture({
     }
 
     captureLock.current = true;
-    toast.success("Face captured");
+    showErrorToastOnce("Face captured");
 
     onCapture(Array.from(detection.descriptor), direction, preview);
 
@@ -133,7 +138,7 @@ export default function WebCamCapture({
     }
 
     if (detections.length > 1) {
-      toast.error("Multiple faces detected");
+      showErrorToastOnce("Multiple faces detected");
       return;
     }
 

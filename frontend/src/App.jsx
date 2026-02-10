@@ -30,7 +30,7 @@ const App = () => {
         <Route path="/attendance" element={<AttendancePage />} />
 
         <Route path="/attendance-list" element={<AttendanceList />} />
-        {/* cloudfare.exe tunnel --url http://localhost:5173 command for tunnel creation */}
+        {/* cloudflared.exe tunnel --url http://localhost:5173 command for tunnel creation */}
 
         <Route path="*" element={<h2>Page Not Found</h2>} />
       </Routes>

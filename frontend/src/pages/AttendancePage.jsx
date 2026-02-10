@@ -5,7 +5,11 @@ import { Check, Clock, Power } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 const API_URL = `${import.meta.env.VITE_API_INSTANCE}/attendance/mark`;
-
+const showErrorToastOnce = (message) => {
+  toast.error(message, {
+    toastId: message,
+  });
+};
 function AttendancePage() {
   const now = new Date();
   const [status, setStatus] = useState("");
@@ -38,7 +42,7 @@ function AttendancePage() {
         message: err.response?.data?.message || "Face not recognized",
       });
 
-      toast.error("Attendance failed");
+      showErrorToastOnce("Attendance failed");
     } finally {
       setLoading(false);
     }

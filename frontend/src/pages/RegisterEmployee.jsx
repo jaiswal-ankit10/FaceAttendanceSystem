@@ -11,6 +11,12 @@ const API = `${import.meta.env.VITE_API_INSTANCE}/face/register`;
 const POSES = ["FRONT", "RIGHT", "LEFT"];
 const LIVE_POSES = ["FRONT", "RIGHT", "LEFT"];
 
+const showErrorToastOnce = (message) => {
+  toast.error(message, {
+    toastId: message,
+  });
+};
+
 export default function RegisterEmployee() {
   const poseLock = useRef(false);
 
@@ -77,12 +83,12 @@ export default function RegisterEmployee() {
         .withFaceDescriptors();
 
       if (!detections || detections.length === 0) {
-        toast.error(`No face detected for ${nextPose}`);
+        showErrorToastOnce(`No face detected for ${nextPose}`);
         continue;
       }
 
       if (detections.length > 1) {
-        toast.error("Multiple faces detected");
+        showErrorToastOnce("Multiple faces detected");
         return;
       }
 
@@ -127,7 +133,7 @@ export default function RegisterEmployee() {
       setName("");
       setEmpId("");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      showErrorToastOnce(err.response?.data?.message || "Registration failed");
     }
   };
 
