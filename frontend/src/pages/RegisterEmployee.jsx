@@ -114,7 +114,7 @@ export default function RegisterEmployee() {
     const livePoses = captures.filter((c) => LIVE_POSES.includes(c.pose));
 
     if (livePoses.length < LIVE_POSES.length) {
-      toast.error("Capture all poses: FRONT, RIGHT, LEFT");
+      showErrorToastOnce("Capture all poses: FRONT, RIGHT, LEFT");
       return;
     }
 
@@ -159,7 +159,7 @@ export default function RegisterEmployee() {
         </p>
       </div>
 
-      {/* MAIN CONTAINER - Changed from fixed w-[900px] to max-w-4xl and flex-col for mobile */}
+      {/* MAIN CONTAINER */}
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl flex flex-col md:flex-row overflow-hidden">
         {/* LEFT PANEL: Camera/Upload Section */}
         <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col items-center justify-center bg-gray-50/50">
@@ -172,7 +172,7 @@ export default function RegisterEmployee() {
           <div className="w-full flex flex-col items-center">
             {useWebcam ? (
               currentPoseIndex < POSES.length ? (
-                <div className="w-full aspect-video md:aspect-square lg:aspect-video overflow-hidden rounded-xl">
+                <div className="w-full aspect-square md:aspect-square lg:aspect-square rounded-xl">
                   <WebCamCapture
                     key={POSES[currentPoseIndex]}
                     onCapture={handleCapture}

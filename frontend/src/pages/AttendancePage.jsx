@@ -77,10 +77,10 @@ function AttendancePage() {
         </div>
 
         {/* Attendance Card */}
-        <div className="bg-white min-h-[60vh] rounded-2xl shadow-lg p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white min-h-[70vh] rounded-2xl shadow-lg p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Camera Section */}
           <div className="relative bg-gray-50 rounded-xl p-2 flex flex-col items-center">
-            <div className="relative  rounded-xl overflow-hidden">
+            <div className="relative w-full aspect-square md:aspect-square lg:aspect-square  rounded-xl">
               <WebcamCapture
                 onCapture={handleCapture}
                 cameraEnabled={cameraEnabled}

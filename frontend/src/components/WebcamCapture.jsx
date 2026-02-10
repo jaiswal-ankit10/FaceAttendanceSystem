@@ -69,7 +69,7 @@ export default function WebCamCapture({
 
     if (!detections || detections.length === 0) {
       clearCanvas();
-      toast.error("No face detected");
+      showErrorToastOnce("No face detected");
       return;
     }
 
@@ -102,7 +102,7 @@ export default function WebCamCapture({
     }
 
     captureLock.current = true;
-    showErrorToastOnce("Face captured");
+    toast.success("Face captured");
 
     onCapture(Array.from(detection.descriptor), direction, preview);
 
@@ -133,7 +133,7 @@ export default function WebCamCapture({
     setProcessing(false);
 
     if (!detections || detections.length === 0) {
-      toast.error("No face detected");
+      showErrorToastOnce("No face detected");
       return;
     }
 
